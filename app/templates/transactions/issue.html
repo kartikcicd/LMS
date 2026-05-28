@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Issue Book – LibraryMS{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center mb-4">
+    <a href="{{ url_for('transactions.index') }}" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-left"></i></a>
+    <h4 class="fw-bold mb-0"><i class="bi bi-plus-circle text-primary me-2"></i>Issue Book</h4>
+</div>
+<div class="card" style="max-width:550px">
+    <div class="card-body p-4">
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Select Book *</label>
+                <select name="book_id" class="form-select" required>
+                    <option value="">-- Choose a book --</option>
+                    {% for book in books %}
+                    <option value="{{ book.id }}">{{ book.title }} by {{ book.author }} ({{ book.available_copies }} available)</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Select Member *</label>
+                <select name="member_id" class="form-select" required>
+                    <option value="">-- Choose a member --</option>
+                    {% for member in members %}
+                    <option value="{{ member.id }}">{{ member.name }} ({{ member.email }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Loan Duration (days)</label>
+                <input type="number" name="loan_days" class="form-control" min="1" max="90" value="14">
+            </div>
+            <button type="submit" class="btn btn-primary px-4">
+                <i class="bi bi-check-lg me-1"></i> Issue Book
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

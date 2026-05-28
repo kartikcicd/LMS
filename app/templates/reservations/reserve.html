@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Reserve Book – LibraryMS{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center mb-4">
+    <a href="{{ url_for('reservations.index') }}" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-left"></i></a>
+    <h4 class="fw-bold mb-0"><i class="bi bi-bookmark-plus text-warning me-2"></i>Reserve a Book</h4>
+</div>
+
+{% if not books %}
+<div class="alert alert-info">
+    <i class="bi bi-info-circle me-2"></i>All books currently have available copies — no reservations needed!
+    <a href="{{ url_for('transactions.issue') }}" class="alert-link ms-2">Issue a book instead →</a>
+</div>
+{% else %}
+<div class="card" style="max-width:500px">
+    <div class="card-body p-4">
+        <p class="text-muted small mb-3">Reserve a book that is currently fully issued. The reservation will be fulfilled when the book is next issued to this member.</p>
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Select Book (unavailable) *</label>
+                <select name="book_id" class="form-select" required>
+                    <option value="">-- Choose a book --</option>
+                    {% for book in books %}
+                    <option value="{{ book.id }}">{{ book.title }} by {{ book.author }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Select Member *</label>
+                <select name="member_id" class="form-select" required>
+                    <option value="">-- Choose a member --</option>
+                    {% for member in members %}
+                    <option value="{{ member.id }}">{{ member.name }} ({{ member.email }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-warning px-4">
+                <i class="bi bi-bookmark-check me-1"></i> Reserve
+            </button>
+        </form>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

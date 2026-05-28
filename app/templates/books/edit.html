@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Edit Book – LibraryMS{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center mb-4">
+    <a href="{{ url_for('books.index') }}" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-left"></i></a>
+    <h4 class="fw-bold mb-0"><i class="bi bi-pencil text-warning me-2"></i>Edit Book</h4>
+</div>
+<div class="card" style="max-width:600px">
+    <div class="card-body p-4">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Title *</label>
+                <input type="text" name="title" class="form-control" required value="{{ book.title }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Author *</label>
+                <input type="text" name="author" class="form-control" required value="{{ book.author }}">
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label class="form-label fw-semibold">Genre</label>
+                    <input type="text" name="genre" class="form-control" value="{{ book.genre or '' }}">
+                </div>
+                <div class="col">
+                    <label class="form-label fw-semibold">ISBN</label>
+                    <input type="text" name="isbn" class="form-control" value="{{ book.isbn or '' }}">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Total Copies</label>
+                <input type="number" name="total_copies" class="form-control" min="1" value="{{ book.total_copies }}">
+                <small class="text-muted">Currently {{ book.total_copies - book.available_copies }} cop(ies) issued.</small>
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Cover Image</label>
+                {% if book.cover_image %}
+                    <div class="mb-2"><img src="{{ url_for('static', filename='uploads/' + book.cover_image) }}" style="height:80px;border-radius:6px"></div>
+                {% endif %}
+                <input type="file" name="cover_image" class="form-control" accept="image/*">
+                <small class="text-muted">Leave blank to keep existing cover.</small>
+            </div>
+            <button type="submit" class="btn btn-warning px-4">
+                <i class="bi bi-save me-1"></i> Save Changes
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block title %}{{ member.name }} – Profile{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center mb-4">
+    <a href="{{ url_for('members.index') }}" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-left"></i></a>
+    <h4 class="fw-bold mb-0"><i class="bi bi-person-circle text-success me-2"></i>Member Profile</h4>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Member Info Card -->
+    <div class="col-md-4">
+        <div class="card p-4 h-100">
+            <div class="text-center mb-3">
+                <div style="width:72px;height:72px;background:#e9f7ef;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto">
+                    <i class="bi bi-person fs-2 text-success"></i>
+                </div>
+                <h5 class="fw-bold mt-3 mb-0">{{ member.name }}</h5>
+                <p class="text-muted small">{{ member.email }}</p>
+            </div>
+            <hr>
+            <div class="small">
+                <p><i class="bi bi-phone me-2 text-muted"></i>{{ member.phone or 'N/A' }}</p>
+                <p><i class="bi bi-calendar me-2 text-muted"></i>Joined {{ member.membership_date.strftime('%d %b %Y') }}</p>
+                <p><i class="bi bi-bookmark me-2 text-muted"></i>Limit: {{ member.max_books }} books</p>
+                <p>
+                    <i class="bi bi-circle-fill me-2 {% if member.is_active %}text-success{% else %}text-secondary{% endif %}" style="font-size:0.6rem"></i>
+                    {{ 'Active' if member.is_active else 'Inactive' }}
+                </p>
+            </div>
+            <hr>
+            <div class="row text-center g-2">
+                <div class="col-4">
+                    <div class="fw-bold text-primary fs-5">{{ active_count }}</div>
+                    <div class="text-muted" style="font-size:0.75rem">Issued</div>
+                </div>
+                <div class="col-4">
+                    <div class="fw-bold text-success fs-5">{{ transactions|selectattr('status','eq','returned')|list|length }}</div>
+                    <div class="text-muted" style="font-size:0.75rem">Returned</div>
+                </div>
+                <div class="col-4">
+                    <div class="fw-bold text-danger fs-5">₹{{ '%.0f'|format(total_fine) }}</div>
+                    <div class="text-muted" style="font-size:0.75rem">Total Fine</div>
+                </div>
+            </div>
+            <div class="mt-3">
+                <a href="{{ url_for('members.edit', member_id=member.id) }}" class="btn btn-outline-warning btn-sm w-100">
+                    <i class="bi bi-pencil me-1"></i> Edit Member
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction History -->
+    <div class="col-md-8">
+        <div class="card mb-3">
+            <div class="card-header fw-semibold"><i class="bi bi-clock-history me-2"></i>Borrow History</div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0 small">
+                    <thead class="table-light"><tr><th>#</th><th>Book</th><th>Issued</th><th>Due</th><th>Returned</th><th>Status</th><th>Fine</th></tr></thead>
+                    <tbody>
+                    {% for t in transactions %}
+                    <tr>
+                        <td>{{ t.id }}</td>
+                        <td class="fw-semibold">{{ t.book.title }}</td>
+                        <td>{{ t.issue_date.strftime('%d %b %Y') }}</td>
+                        <td class="{% if t.status == 'overdue' %}text-danger{% endif %}">{{ t.due_date.strftime('%d %b %Y') }}</td>
+                        <td>{{ t.return_date.strftime('%d %b %Y') if t.return_date else '—' }}</td>
+                        <td>
+                            {% if t.status == 'returned' %}<span class="badge bg-success">Returned</span>
+                            {% elif t.status == 'overdue' %}<span class="badge bg-danger">Overdue</span>
+                            {% else %}<span class="badge bg-primary">Issued</span>{% endif %}
+                        </td>
+                        <td>{% if t.fine() > 0 %}<span class="text-danger">₹{{ '%.2f'|format(t.fine()) }}</span>{% else %}—{% endif %}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" class="text-center text-muted py-3">No borrow history.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Reservations -->
+        {% if reservations %}
+        <div class="card">
+            <div class="card-header fw-semibold"><i class="bi bi-bookmark me-2"></i>Reservations</div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0 small">
+                    <thead class="table-light"><tr><th>Book</th><th>Reserved On</th><th>Status</th></tr></thead>
+                    <tbody>
+                    {% for r in reservations %}
+                    <tr>
+                        <td>{{ r.book.title }}</td>
+                        <td>{{ r.reserved_date.strftime('%d %b %Y') }}</td>
+                        <td>
+                            {% if r.status == 'pending' %}<span class="badge bg-warning text-dark">Pending</span>
+                            {% elif r.status == 'fulfilled' %}<span class="badge bg-success">Fulfilled</span>
+                            {% else %}<span class="badge bg-secondary">Cancelled</span>{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
